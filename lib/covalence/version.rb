@@ -1,3 +1,3 @@
 module Covalence
-  VERSION = "0.8.3"
+  VERSION = ENV["COVALENCE_VERSION"] || "0.9.7"
 end

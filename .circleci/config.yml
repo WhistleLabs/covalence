@@ -5,9 +5,10 @@ jobs:
     working_directory: ~/repo
 
     docker:
-      - image: circleci/ruby:2.5.1
+      - image: circleci/ruby:2.5.5
 
     environment:
+      BUNDLER_VERSION: 1.17.3
       TERRAFORM_VERSION: 0.12.9
       SOPS_VERSION: 3.0.5
 
@@ -32,6 +33,7 @@ jobs:
             sudo chmod +x /usr/local/bin/prefixout;
 
             # Install gem bundle
+            gem install bundler:${BUNDLER_VERSION}
             bundle install
 
       - run:
