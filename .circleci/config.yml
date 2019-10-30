@@ -5,11 +5,11 @@ jobs:
     working_directory: ~/repo
 
     docker:
-      - image: circleci/ruby:2.5.1
+      - image: circleci/ruby:2.5.5
 
     environment:
-      COVALENCE_VERSION: 0.8.3
-      TERRAFORM_VERSION: 0.11.7
+      BUNDLER_VERSION: 1.17.3
+      TERRAFORM_VERSION: 0.12.9
       SOPS_VERSION: 3.0.5
 
     steps:
@@ -19,36 +19,44 @@ jobs:
           name: Install dependencies
           command: |
             # Install Terraform
-            wget -q "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-            unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+            sudo wget -qO /tmp/terraform_${TERRAFORM_VERSION}_linux_amd64.zip "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" && \
+            sudo unzip -d /usr/local/bin /tmp/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+            sudo chmod +x /usr/local/bin/terraform
 
             # Install Sops
             sudo wget -q "https://github.com/mozilla/sops/releases/download/${SOPS_VERSION}/sops-${SOPS_VERSION}.linux" -O /usr/local/bin/sops
             sudo chmod +x /usr/local/bin/sops
 
+            # prefixout used in covaelnce for logging output of commands delivered
+            sudo wget -qO /tmp/prefixout_0.1.0_linux_amd64.zip "https://github.com/WhistleLabs/prefixout/releases/download/v0.1.0/prefixout_0.1.0_linux_amd64.zip" && \
+            sudo unzip -d /usr/local/bin /tmp/prefixout_0.1.0_linux_amd64.zip && \
+            sudo chmod +x /usr/local/bin/prefixout;
+
             # Install gem bundle
+            gem install bundler:${BUNDLER_VERSION}
             bundle install
 
       - run:
           name: Run tests
           command: bundle exec rake ci:covalence
 
-      - run:
-          name: Setup gem credentials
-          command: |
-            mkdir -p ~/.gem/
-            cat <<EOF >~/.gem/credentials
-            ---
-            :rubygems_api_key: ${RUBYGEMS_API_KEY}
-            EOF
-            chmod 600 ~/.gem/credentials
-
-      - deploy:
-          name: Publish gem to rubygems
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              gem signin
-              gem build covalence.gemspec
-              COVALENCE_VERSION=$(ruby -e "require \"#{Dir.pwd}/lib/covalence/version\"; puts Covalence::VERSION")
-              gem push covalence-${COVALENCE_VERSION}.gem
-            fi
+# comment out the deploy for now since our dockerfile-ci build does not use the https://rubygems.org/gems/ repository
+#      - run:
+#          name: Setup gem credentials
+#          command: |
+#            mkdir -p ~/.gem/
+#            cat <<EOF >~/.gem/credentials
+#            ---
+#            :rubygems_api_key: ${RUBYGEMS_API_KEY}
+#            EOF
+#            chmod 600 ~/.gem/credentials
+#
+#      - deploy:
+#          name: Publish gem to rubygems
+#          command: |
+#            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+#              gem signin
+#              gem build covalence.gemspec
+#              COVALENCE_VERSION=$(ruby -e "require \"#{Dir.pwd}/lib/covalence/version\"; puts Covalence::VERSION")
+#              gem push covalence-${COVALENCE_VERSION}.gem
+#            fi

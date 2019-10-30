@@ -1,7 +1,5 @@
 # Covalence
-[![CircleCI](https://circleci.com/gh/unifio/covalence.svg?style=svg)](https://circleci.com/gh/unifio/covalence)
-[![Dependency Status](https://gemnasium.com/badges/github.com/unifio/covalence.svg)](https://gemnasium.com/github.com/unifio/covalence)
-
+[![CircleCI](https://circleci.com/gh/WhistleLabs/covalence.svg?style=svg)](https://circleci.com/gh/WhistleLabs/covalence)
 A tool for the management and orchestration of data used by HashiCorp infrastructure tooling.
 
 <img src="./images/bond.jpg">
