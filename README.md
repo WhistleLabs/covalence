@@ -104,7 +104,6 @@ $ bin/covalence spec
 ```
 
 To run the Rspec test locally without container, you will need to install the following:
-* prefixout -- https://github.com/WhistleLabs/prefixout
 * sops -- https://github.com/mozilla/sops
 
 ### UAT
